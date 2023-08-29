@@ -1,56 +1,18 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
-*.py[cod]
-*$py.class
 
 # Logs
 logs/
 *.log
-*.log.*
-*.txt
 
 # Virtual environment
 venv/
-env/
-ENV/
-.vscode/
-
-# Compiled source
-*.com
-*.class
-*.dll
-*.exe
-*.o
-*.so
-*.pyd
-
-# Distribution / packaging
-*.egg-info/
-dist/
-build/
-*.egg
-
-# macOS specific files
-.DS_Store
-
-# Jupyter Notebook specific files
-.ipynb_checkpoints/
-
-# Compiled Python files
-__pycache__/
-*.pyc
-*.pyo
 
 # IDE files
 .idea/
 
-# Editor-specific temp files
-*~
-*.swp
-*.swo
-*.DS_Store
-*.bak
-
+# envioerment variable file
 .env
+
 #private folder for local use
 private/
