@@ -3,9 +3,7 @@ from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from re import fullmatch
-
 import numpy
-
 from notify import Notify
 from dotenv import load_dotenv
 from os import environ
@@ -16,7 +14,9 @@ from src.consts import TEMPLATE_BODY_HEADER, TEMPLATE_BODY_FOOTER, STYLE_TEMPLAT
 
 def validate_email(email: str) -> bool:
     """
-    helper function to validate email address input
+    helper function to validate an email address input
+    :param email: email address to be validated
+    :return: bool
     """
     regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
     if fullmatch(regex, email):
@@ -58,8 +58,10 @@ class EmailNotifier(Notify):
         :param coordinates: latitude and longitude coordinates of fire location
         :return: None
         """
+        # encode the image to be able to attach to email
         _, encoded_image = cv2.imencode(PNG, image)
         image_bytes = encoded_image.tobytes()
+
         for recipient in self.recipient_list:
             self.__send_email(recipient, image_bytes, coordinates)
 
@@ -92,12 +94,10 @@ class EmailNotifier(Notify):
         message['Subject'] = EMAIL_SUBJECT
 
         html_template = STYLE_TEMPLATE + TEMPLATE_BODY_HEADER + f"""        
-              <p class="coordinates">Coordinates: {coordinates[0]}, {coordinates[1]}</p>""" + TEMPLATE_BODY_FOOTER
+              <p class="Link">https://www.google.com/maps/search/?api=1&query={coordinates[0]}%2C{coordinates[1]}</p>
+            """ + TEMPLATE_BODY_FOOTER
 
         message.attach(MIMEText(html_template, 'html'))
-        img = MIMEImage(image_data, name="fire_alert_image.jpg")
-        message.attach(img)
+        fire_image = MIMEImage(image_data, name="fire_alert_image.jpg")
+        message.attach(fire_image)
         return message.as_string()
-
-
-
