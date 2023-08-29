@@ -51,6 +51,6 @@ __pycache__/
 *.DS_Store
 *.bak
 
-
+.env
 #private folder for local use
 private/
