@@ -3,10 +3,15 @@ from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from re import fullmatch
+
+import numpy
+
 from notify import Notify
 from dotenv import load_dotenv
 from os import environ
 import logging
+import cv2
+from src.consts import TEMPLATE_BODY_HEADER, TEMPLATE_BODY_FOOTER, STYLE_TEMPLATE, PNG, EMAIL_SUBJECT
 
 
 def validate_email(email: str) -> bool:
@@ -46,18 +51,19 @@ class EmailNotifier(Notify):
         if validate_email(receiver_address):
             self.recipient_list.append(receiver_address)
 
-    def send_notification(self, image, coordinates: tuple[float, float]) -> None:
+    def send_notification(self, image: numpy.ndarray, coordinates: tuple[float, float]) -> None:
         """
         send a fire alert email to a list of recipients
         :param image: photograph of fire
         :param coordinates: latitude and longitude coordinates of fire location
         :return: None
         """
-        image_data = image.read()
+        _, encoded_image = cv2.imencode(PNG, image)
+        image_bytes = encoded_image.tobytes()
         for recipient in self.recipient_list:
-            self.__send_email(recipient, image_data, coordinates)
+            self.__send_email(recipient, image_bytes, coordinates)
 
-    def __send_email(self, receiver_email: str, image_data, coordinates: tuple[float, float]) -> None:
+    def __send_email(self, receiver_email: str, image_data: bytes, coordinates: tuple[float, float]) -> None:
         """
         send a rendered fire alert notification email to a recipient
         :param receiver_email: receiver's email address
@@ -72,7 +78,7 @@ class EmailNotifier(Notify):
         except smtplib.SMTPException as e:
             logging.error(f"Failed to send notification to {receiver_email}: {str(e)}")
 
-    def __prepare_message_body(self, receiver_email: str, image_data, coordinates: tuple[float, float]) -> str:
+    def __prepare_message_body(self, receiver_email: str, image_data: bytes, coordinates: tuple[float, float]) -> str:
         """
         prepare and message body template and content for sending as email
         param receiver_email: receiver's email address
@@ -83,21 +89,15 @@ class EmailNotifier(Notify):
         message = MIMEMultipart()
         message['From'] = self.system_email_address
         message['To'] = receiver_email
-        message['Subject'] = "Fire Alert Notification"
+        message['Subject'] = EMAIL_SUBJECT
 
-        email_template = f"""
-                    Fire Alert Notification
-    
-                     A fire has been detected at the following location:
-                     Coordinates: {coordinates[0]}, {coordinates[1]}
-    
-                     Please find the attached images for reference.
-    
-                     Regards
-                     Wild Fire Warning system
-                             """
+        html_template = STYLE_TEMPLATE + TEMPLATE_BODY_HEADER + f"""        
+              <p class="coordinates">Coordinates: {coordinates[0]}, {coordinates[1]}</p>""" + TEMPLATE_BODY_FOOTER
 
-        message.attach(MIMEText(email_template, 'plain'))
+        message.attach(MIMEText(html_template, 'html'))
         img = MIMEImage(image_data, name="fire_alert_image.jpg")
         message.attach(img)
         return message.as_string()
+
+
+
