@@ -131,6 +131,15 @@ class Camera:
         self.last_frame = frame
         return frame
 
+    def get_location(self) -> tuple:
+        """
+        @summary:
+            get the location of the camera
+        @return: tuple
+            the location of the camera
+        """
+        return (31.770772026697788, 35.182087722966905)
+
 
 # # main:
 # counter = 0
