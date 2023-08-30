@@ -4,7 +4,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from re import fullmatch
 import numpy
-from notify import Notify
+from .notify import Notify
 from dotenv import load_dotenv
 from os import environ
 import logging
