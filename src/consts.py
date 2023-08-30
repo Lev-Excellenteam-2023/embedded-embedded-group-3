@@ -66,3 +66,5 @@ PNG = ".png"
 JPG = ".jpg"
 
 # endregion
+
+IMAGE_SIZE = 128
