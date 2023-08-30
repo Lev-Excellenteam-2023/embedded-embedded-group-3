@@ -87,4 +87,3 @@ class Camera:
             return None
 
         return frame
-    
