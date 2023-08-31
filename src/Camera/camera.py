@@ -3,6 +3,7 @@ import threading
 import numpy as np
 import logging
 from typing import Union
+import time
 
 
 class Camera:
@@ -24,6 +25,7 @@ class Camera:
         self.camera_id = camera_id
         self.cap = None
         self.is_streaming = False
+        self.last_frame = np.zeros((480, 640, 3), np.uint8)
 
     def streamOn(self) -> None:
         """
@@ -70,6 +72,44 @@ class Camera:
 
         threading.Thread(target=display_feed).start()
 
+    def mse(self, new_frame: np.ndarray) -> float:
+        """
+        @summary:
+            Compute the mean squared error between the provided image and the last frame.
+        @param new_frame: np.ndarray
+            The image to compare with the last frame.
+        @return: float
+            The mean squared error between the two images.
+        """
+        last_frame = self.last_frame
+        mean_squared_error = np.sum((new_frame.astype("float") - last_frame.astype("float")) ** 2)
+        mean_squared_error /= float(new_frame.size)  # Using size to count all elements in the array
+        return float(mean_squared_error)  # Ensure the result is a float
+
+    def isSimilarToLastFrame(self, frame: np.ndarray) -> bool:
+        """
+        @summary:
+            check if the given frame is similar to the last frame.
+            An image is similar to another image if there is no lot of difference between them.
+        @param frame: np.ndarray
+            the frame to check.
+        @return: bool
+            True if the given frame is similar to the last frame, False otherwise.
+        """
+        if not self.is_streaming:
+            logging.error("Camera is not streaming!")
+            return False
+
+        # Compute the mean squared error between the given frame and the last frame
+        error = self.mse(frame)  # Update this line
+
+        # Update the last frame
+        # self.last_frame = frame
+
+        # Consider two frames to be similar if the error is below a threshold
+        threshold = 1200
+        return error < threshold
+
     def getCurrentFrame(self) -> Union[np.ndarray, None]:
         """
         @summary: int
@@ -86,4 +126,17 @@ class Camera:
             logging.error("Error: Can't receive frame!")
             return None
 
+        if self.isSimilarToLastFrame(frame):
+            return None
+        self.last_frame = frame
         return frame
+
+    def get_location(self) -> tuple:
+        """
+        @summary:
+            get the location of the camera
+        @return: tuple
+            the location of the camera
+        """
+        return (31.770772026697788, 35.182087722966905)
+
