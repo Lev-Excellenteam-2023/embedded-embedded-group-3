@@ -90,9 +90,10 @@ class FireDetector:
         """
         desired_shape = (IMAGE_SIZE, IMAGE_SIZE)
         resized_image = FireDetector.__resize_and_pad_image(image, desired_shape)
+        resized_image = cv2.cvtColor(resized_image, cv2.COLOR_BGR2RGB)
         if not FireDetector.__filter_by_color(resized_image):
             return False
         preprocessed_image = resized_image.astype('float32') / 255.0
         preprocessed_image = np.expand_dims(preprocessed_image, axis=0)
-        predictions = self.__model.predict(preprocessed_image, verbose=0)
-        return predictions[0][0] <= 0.5
+        predictions = self.__model(preprocessed_image)
+        return predictions.numpy()[0][0] <= 0.5
