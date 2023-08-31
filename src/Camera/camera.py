@@ -140,18 +140,3 @@ class Camera:
         """
         return (31.770772026697788, 35.182087722966905)
 
-
-# # main:
-# counter = 0
-# if __name__ == "__main__":
-#     camera = Camera(1)
-#     camera.streamOn()
-#     while True:
-#         time.sleep(0.1)
-#         frame = camera.getCurrentFrame()
-#         if frame is not None:
-#             print("Different" + str(counter))
-#             counter += 1
-#             cv2.imshow("Frame", frame)
-#             if cv2.waitKey(1) == ord('q'):
-#                 break
