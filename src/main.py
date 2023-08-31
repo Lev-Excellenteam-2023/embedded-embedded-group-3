@@ -13,6 +13,8 @@ def main():
     email_notifier.add_recipient_email(RECEIVER_EMAIL)
     while True:
         captured_frame: numpy.ndarray = camera.getCurrentFrame()
+        if captured_frame is None:
+            continue
         if fire_detector.predict_image(captured_frame):
             email_notifier.send_notification(captured_frame, camera.get_location())
 
