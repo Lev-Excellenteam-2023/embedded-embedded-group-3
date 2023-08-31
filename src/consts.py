@@ -72,5 +72,5 @@ WEBCAM = 0
 EXTERNAL_CAM = 1
 # endregion
 IMAGE_SIZE = 128
-MODEL_PATH = "fire_detector/MP_acc.h5"
+MODEL_PATH = "fire_detector/MP_update_acc.h5"
 RECEIVER_EMAIL = "jacober9243@gmail.com"
