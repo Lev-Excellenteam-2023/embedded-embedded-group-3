@@ -96,4 +96,4 @@ class FireDetector:
         preprocessed_image = resized_image.astype('float32') / 255.0
         preprocessed_image = np.expand_dims(preprocessed_image, axis=0)
         predictions = self.__model(preprocessed_image)
-        return predictions.numpy()[0][0] <= 0.5
+        return predictions.numpy()[0][0] <= 0.16
